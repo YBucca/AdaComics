@@ -2,5 +2,29 @@
   width: 100%;
   min-height: 400px;
   background-image: url(../../assets/Wonder-Woman-1984-No.-1.png);
-  background-size : auto; 
+  background-size : auto;
+}
+header{
+display:flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+}
+
+h1{
+color:$color-gold;
+font-family:$font-primary;
+font-size:5rem;
+}
+
+.bg-title{
+background-image:url(../../assets/los-e-u-diseñan-las-estrellas-blancas-del-modelo-inconsútil-en-fondo-azul-111287876.jpeg);
+background-size: cover;
+width: 100%;
+height:20%;
+display:flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+opacity:85% 
 }
