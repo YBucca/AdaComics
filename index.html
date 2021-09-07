@@ -5,10 +5,14 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <link rel="stylesheet" href="./sass/main.css">
+  
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/bootstrap.css">
+<link rel="stylesheet" href="./sass/main.css">
+<script src="https://kit.fontawesome.com/2b0ee45a2e.js" crossorigin="anonymous"></script>
+
 </head>
 <body class="themes">
   <header>
@@ -21,36 +25,66 @@
   </div>
   <main>
     <div class="bg-form">
-        <h2>Búsqueda</h2>
-        <div class="flex">
-          <div>
-            <input type="text" placeholder="Ingresá tu búsqueda">
-          </div>
-          <div>
-            <div>
-              <label for="">TIPO</label>
-              <select name="" id="">
-                <option value="">COMICS</option>
-                <option value="">PERSONAJES</option>
-              </select>
-              <label for="">ORDEN</label>
-              <select name="" id="">
-                <option value="">A-Z</option>
+        
+
+
+<form>
+ <h3>BÚSQUEDA </h3>
+
+  <div class="form-row">
+    <div class="col-md-6 mb-3">
+       <label for="validationDefault04"><i class="fas fa-search"></i></label>
+      <input type="text" class="form-control" id="validationDefault03" required placeholder="Ingresá tu búsqueda">
+    </div>
+
+    <div class="col-md-3 mb-3">
+      <label for="validationDefault04">Tipo</label>
+      <select class="custom-select" id="validationDefault04" required placeholder="COMICS" >
+        <option selected disabled value="">COMIC</option>
+        <option>...</option>
+      </select>
+    </div>
+<div class="col-md-3 mb-3">
+      <label for="validationDefault04">Orden</label>
+      <select class="custom-select" id="validationDefault04" required >
+        <option value="">A-Z</option>
                 <option value="">Z-A</option>
                 <option value="">Más nuevos</option>
                 <option value="">Más viejos</option>
-              </select>
-            </div>
-            <button>BUSCAR</button>
-          </div>
-
-        </div>
+      </select>
     </div>
+
+  </div>
+<div class="d-flex flex-row-reverse bd-highlight">
+
+
+
+    <button class="btn btn-primary" type="submit"> BUSCAR</button>
+ </div>
+  <footer>Hecho con   por belu y Yani </footer>
+ 
+</form>
+
+
+
+
+
+
+
+
+
+
+
 
 </main>
 
 
-  
-  
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+ <script src="./js/bootstrap.min.js"></script>
 </body>
 </html>
+
+
+
+
+
