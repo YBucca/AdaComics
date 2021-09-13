@@ -19,8 +19,20 @@ const marvel = {
     fetch(urlAPI)
     .then(res => res.json())
     .then((json)=> {
-        console.log(json,"RES.JSON")
-        });
+        for(const hero of json.data.results){
+          let urlHero = hero.urls[0].url;
+          console.log("+++ hero.thumbnail +++", hero.thumbnail)
+          contentHTML += `
+          <div class="col-md-4">
+              <a href="${urlHero}" target="_blank">
+                <img src="${hero.thumbnail.path}.${hero.thumbnail.extension}" alt="${hero.name}" class="img-thumbnail"> 
+              </a>
+              <h3 class="title">${hero.name}"</h3>
+          </div> 
+          `;
+        }
+        container.innerHTML = contentHTML;
+      });
    }
 };
 marvel.render();
