@@ -23,7 +23,7 @@ const marvel = {
           let urlHero = hero.urls[0].url;
           console.log("+++ hero.thumbnail +++", hero.thumbnail)
           contentHTML += `
-          <div class="col-md-4">
+          <div class="col-md-3">
               <a href="${urlHero}" target="_blank">
                 <img src="${hero.thumbnail.path}.${hero.thumbnail.extension}" alt="${hero.name}" class="img-thumbnail"> 
               </a>
