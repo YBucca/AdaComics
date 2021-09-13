@@ -79,4 +79,9 @@ h1 {
       -ms-flex-direction: row;
           flex-direction: row;
 }
+
+img.img-thumbnail {
+  width: 250px;
+  height: 250px;
+}
 /*# sourceMappingURL=main.css.map */
