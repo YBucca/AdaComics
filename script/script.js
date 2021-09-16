@@ -72,3 +72,18 @@ comicMarvel.render();
 
 
 // https://gateway.marvel.com:443/v1/public/comics?apikey=9ca1976d23ace42021fea1ba2225b7bd
+
+
+//###### PAGINACION #######
+const params = new URLSearchParams(window.location.search);
+const return1 = document.getElementById('return-one')
+const forward1 = document.getElementById('forward-one')
+
+// setear en parametro de la url
+
+const search = params.get("description");
+const type = params.get("type");
+const order = params.get("order");
+const page = params.get("page");
+
+params.set('page', page+1)
