@@ -1,6 +1,4 @@
-// const baseUrL= "";
 // const apiKey = "9ca1976d23ace42021fea1ba2225b7bd";
-
 // https://gateway.marvel.com:443/v1/public/characters?apikey=9ca1976d23ace42021fea1ba2225b7bd
 // public 9ca1976d23ace42021fea1ba2225b7bd
 // private   8317076127f02840e2a8ace0207c5d934fe6632e
@@ -9,7 +7,6 @@
 // ++++esta es la funcion de personajes+++++++
 
 // const marvel = {
-// // 18317076127f02840e2a8ace0207c5d934fe6632e9ca1976d23ace42021fea1ba2225b7bd
 
 //   render:() => {
 //     const urlAPI ="https://gateway.marvel.com:443/v1/public/characters?ts=1&apikey=9ca1976d23ace42021fea1ba2225b7bd&hash=3722a07e43de87305375496f55f99f7a&offset=20&limit=20";
@@ -40,36 +37,46 @@
 
 
 //  +++++   este es la funcion de comic +++++++++
+const baseUrl = `https://gateway.marvel.com:443/v1/public`;
+const auth = `ts=1&apikey=9ca1976d23ace42021fea1ba2225b7bd&hash=3722a07e43de87305375496f55f99f7a`;
+const renderComics = (json) => {
+  console.log('+++json+++', json)
 
-const comicMarvel = {
-// 18317076127f02840e2a8ace0207c5d934fe6632e9ca1976d23ace42021fea1ba2225b7bd
-
-  render:() => {
-    const urlAPI2 ="https://gateway.marvel.com:443/v1/public/comics?ts=1&apikey=9ca1976d23ace42021fea1ba2225b7bd&hash=3722a07e43de87305375496f55f99f7a&offset=20&limit=20";
-    const container2 = document.querySelector(`#marvelComic-row`);
-    let contentHTML2="";
-
-    fetch(urlAPI2)
-    .then(res => res.json())
-    .then((json)=> {
-        for(const comic of json.data.results){
-          let urlComic = comic.urls[0].url;
           // console.log("+++ comic.thumbnail +++", comic.thumbnail)
-          contentHTML2 += `
-          <div class="col-md-3">
-              <a href="${urlComic}" target="_blank">
+          return json.data.result.map(comic =>{
+       `  <div class="col-md-3">
+              <a href="${comic.urls[0].url}" target="_blank">
                 <img src="${comic.thumbnail.path}.${comic.thumbnail.extension}" alt="${comic.title}" class="img-thumbnail"> 
               </a>
               <h3 class="title">${comic.title}"</h3>
           </div> 
           `;
-        }
-        container2.innerHTML = contentHTML2;
+        });
+    };
+const comicMarvel = {
+
+  render:(endpoint, offset, limit, render) => {
+    const urlAPI = () =>{
+      return `${baseUrl}/${endpoint}?${auth}&offset=${offset}&limit=${limit}`;
+    };
+    const container2 = document.querySelector(`#marvelComic-row`);
+    
+
+    fetch(urlAPI(offset = 0, limit = 20,))
+    .then(res => res.json())
+    .then((json)=> {
+        
+        container2.innerHTML = render(json);
       });
    }
 };
-comicMarvel.render();
 
+const select = document.getElementById('selectType');
+
+select.addEventListener('change',(event) => {
+console.log('++++value++++', event.target.value);
+comicMarvel.render(event.target.value, 0, 20,renderComics);
+});
 
 // https://gateway.marvel.com:443/v1/public/comics?apikey=9ca1976d23ace42021fea1ba2225b7bd
 
@@ -87,3 +94,5 @@ const order = params.get("order");
 const page = params.get("page");
 
 params.set('page', page+1)
+
+
