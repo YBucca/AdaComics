@@ -18,5 +18,16 @@ main{
     &.title{
       font-size: 1.3rem;}
     }
-  
+  nav{
+    .pagination {
+    margin-bottom: 50px;
+    margin-top: 50px;
+    
+  }
+  }
+}
+
+.loader{
+  display: block;
+  margin: auto;
 }

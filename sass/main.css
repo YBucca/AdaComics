@@ -84,6 +84,16 @@ main h3.title {
   font-size: 1.3rem;
 }
 
+main nav .pagination {
+  margin-bottom: 50px;
+  margin-top: 50px;
+}
+
+.loader {
+  display: block;
+  margin: auto;
+}
+
 footer {
   background-color: #E73F42;
   width: 100%;
