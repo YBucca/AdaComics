@@ -1,40 +1,10 @@
-// const apiKey = "9ca1976d23ace42021fea1ba2225b7bd";
-// https://gateway.marvel.com:443/v1/public/characters?apikey=9ca1976d23ace42021fea1ba2225b7bd
-// public 9ca1976d23ace42021fea1ba2225b7bd
-// private   8317076127f02840e2a8ace0207c5d934fe6632e
+const limit = 20;
+let totalCount;
+let resource;
 
-
-// ++++esta es la funcion de personajes+++++++
-
-// const marvel = {
-
-//   render:() => {
-//     const urlAPI ="https://gateway.marvel.com:443/v1/public/characters?ts=1&apikey=9ca1976d23ace42021fea1ba2225b7bd&hash=3722a07e43de87305375496f55f99f7a&offset=20&limit=20";
-//     const container = document.querySelector(`#marvel-row`);
-//     let contentHTML="";
-
-//     fetch(urlAPI)
-//     .then(res => res.json())
-//     .then((json)=> {
-//         for(const hero of json.data.results){
-//           let urlHero = hero.urls[0].url;
-//           console.log("+++ hero.thumbnail +++", hero.thumbnail)
-//           contentHTML += `
-//           <div class="col-md-3">
-//               <a href="${urlHero}" target="_blank">
-//                 <img src="${hero.thumbnail.path}.${hero.thumbnail.extension}" alt="${hero.name}" class="img-thumbnail"> 
-//               </a>
-//               <h3 class="title">${hero.name}"</h3>
-//           </div> 
-//           `;
-//         }
-//         container.innerHTML = contentHTML;
-//       });
-//    }
-// };
-// marvel.render();
-
-
+const getOffset = (page, limit) => {
+    return (page - 1) * limit;
+}
 
 //  +++++   este es la funcion de comic +++++++++
 const baseUrl = `https://gateway.marvel.com:443/v1/public`;
@@ -59,7 +29,6 @@ const templateHero = (json) => {
     let contentHTML = '';
     for (const hero of json.data.results) {
         let urlHero = hero.urls[0].url;
-        console.log('*** hero *** ', hero)
         contentHTML += `
           <div class="col-md-3">
               <a href="${urlHero}" target="_blank">
@@ -74,17 +43,15 @@ const templateHero = (json) => {
 
 const comicMarvel = {
 
-    render: (endpoint, offset, limit, template) => {
+    render: (endpoint, template, offset) => {
         const urlAPI = () => {
             return `${baseUrl}/${endpoint}?${auth}&offset=${offset}&limit=${limit}`;
         };
         const container2 = document.querySelector(`#marvelComic-row`);
-
-
-        fetch(urlAPI(offset = 0, limit = 20, ))
+        fetch(urlAPI(offset))
             .then(res => res.json())
             .then((json) => {
-
+                totalCount = json.data.total;
                 container2.innerHTML = template(json);
             });
     }
@@ -92,30 +59,50 @@ const comicMarvel = {
 
 const select = document.getElementById('selectType');
 
-select.addEventListener('change', (event) => {
-    switch (event.target.value) {
-      case 'comics':
-        return comicMarvel.render(event.target.value, 0, 20, templateComics);
-      case 'characters':
-        return comicMarvel.render(event.target.value, 0, 20, templateHero); 
-      default:
-        return null;
+const renderAll = (resource, page) => {
+    switch (resource) {
+        case 'comics':
+            return comicMarvel.render(resource, templateComics, getOffset(page, limit));
+        case 'characters':
+            return comicMarvel.render(resource, templateHero, getOffset(page, limit));
+        default:
+            return null;
     }
+}
+
+select.addEventListener('change', (event) => {
+    page = 1;
+    resource = event.target.value;
+    renderAll(resource, page)
 });
 
-// https://gateway.marvel.com:443/v1/public/comics?apikey=9ca1976d23ace42021fea1ba2225b7bd
-
-
 //###### PAGINACION #######
+
+
 const params = new URLSearchParams(window.location.search);
+const forwardAll = document.getElementById('forward-all');
+const returnAll = document.getElementById('return-all');
 const return1 = document.getElementById('return-one')
 const forward1 = document.getElementById('forward-one')
 
-// setear en parametro de la url
+forwardAll.addEventListener('click', (event) => {
+    page = totalCount % limit === 0 ? Math.floor(totalCount / limit) : Math.floor(totalCount / limit) + 1;
+    renderAll(resource, page)
+})
 
-const search = params.get("description");
-const type = params.get("type");
-const order = params.get("order");
-const page = params.get("page");
+returnAll.addEventListener('click', (event) => {
+    page = 1;
+    renderAll(resource, page)
+})
 
-params.set('page', page + 1)
+return1.addEventListener('click', (event) => {
+    page = page - 1;
+    renderAll(resource, page)
+})
+
+forward1.addEventListener('click', (event) => {
+    page = page + 1;
+    renderAll(resource, page)
+})
+
+let page = params.get("page") || 1;
