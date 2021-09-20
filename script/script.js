@@ -1,6 +1,8 @@
 const limit = 20;
 let totalCount;
 let resource;
+let searchTerm;
+let serchParam;
 
 const getOffset = (page, limit) => {
     return (page - 1) * limit;
@@ -43,15 +45,15 @@ const templateHero = (json) => {
 
 const comicMarvel = {
 
-    render: (endpoint, template, offset) => {
+    render: (endpoint, template, offset, searchParam) => {
         const urlAPI = () => {
-            return `${baseUrl}/${endpoint}?${auth}&offset=${offset}&limit=${limit}`;
+            return `${baseUrl}/${endpoint}?${auth}&offset=${offset}&limit=${limit}${searchParam}`;
         };
         const container2 = document.querySelector(`#marvelComic-row`);
         fetch(urlAPI(offset))
             .then(res => res.json())
             .then((json) => {
-                totalCount = json.data.total;
+                totalCount = json.data.total || 0;
                 container2.innerHTML = template(json);
             });
     }
@@ -59,12 +61,14 @@ const comicMarvel = {
 
 const select = document.getElementById('selectType');
 
-const renderAll = (resource, page) => {
+const renderAll = (resource, page, searchTerm) => {
     switch (resource) {
         case 'comics':
-            return comicMarvel.render(resource, templateComics, getOffset(page, limit));
+            serchParam = searchTerm? `&titleStartsWith=${searchTerm}` : '';
+            return comicMarvel.render(resource, templateComics, getOffset(page, limit), serchParam);
         case 'characters':
-            return comicMarvel.render(resource, templateHero, getOffset(page, limit));
+            serchParam = searchTerm? `&nameStartsWith=${searchTerm}` : '';
+            return comicMarvel.render(resource, templateHero, getOffset(page, limit), serchParam);
         default:
             return null;
     }
@@ -77,7 +81,6 @@ select.addEventListener('change', (event) => {
 });
 
 //###### PAGINACION #######
-
 
 const params = new URLSearchParams(window.location.search);
 const forwardAll = document.getElementById('forward-all');
@@ -106,3 +109,12 @@ forward1.addEventListener('click', (event) => {
 })
 
 let page = params.get("page") || 1;
+
+// Search
+
+const searchInput = document.getElementById('search')
+
+searchInput.addEventListener('change', (event) => {
+  searchTerm = event.target.value;
+  renderAll(resource, page, searchTerm)
+})
