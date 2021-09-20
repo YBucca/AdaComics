@@ -39,43 +39,68 @@
 //  +++++   este es la funcion de comic +++++++++
 const baseUrl = `https://gateway.marvel.com:443/v1/public`;
 const auth = `ts=1&apikey=9ca1976d23ace42021fea1ba2225b7bd&hash=3722a07e43de87305375496f55f99f7a`;
-const renderComics = (json) => {
-  console.log('+++json+++', json)
-
-          // console.log("+++ comic.thumbnail +++", comic.thumbnail)
-          return json.data.result.map(comic =>{
-       `  <div class="col-md-3">
-              <a href="${comic.urls[0].url}" target="_blank">
+const templateComics = (json) => {
+    let contentHTML = '';
+    for (const comic of json.data.results) {
+        let urlComic = comic.urls[0].url;
+        contentHTML += `
+          <div class="col-md-3">
+              <a href="${urlComic}" target="_blank">
                 <img src="${comic.thumbnail.path}.${comic.thumbnail.extension}" alt="${comic.title}" class="img-thumbnail"> 
               </a>
               <h3 class="title">${comic.title}"</h3>
           </div> 
           `;
-        });
-    };
+    }
+    return contentHTML;
+};
+
+const templateHero = (json) => {
+    let contentHTML = '';
+    for (const hero of json.data.results) {
+        let urlHero = hero.urls[0].url;
+        console.log('*** hero *** ', hero)
+        contentHTML += `
+          <div class="col-md-3">
+              <a href="${urlHero}" target="_blank">
+                <img src="${hero.thumbnail.path}.${hero.thumbnail.extension}" alt="${hero.name}" class="img-thumbnail"> 
+              </a>
+              <h3 class="title">${hero.name}</h3>
+          </div> 
+          `;
+    }
+    return contentHTML;
+};
+
 const comicMarvel = {
 
-  render:(endpoint, offset, limit, render) => {
-    const urlAPI = () =>{
-      return `${baseUrl}/${endpoint}?${auth}&offset=${offset}&limit=${limit}`;
-    };
-    const container2 = document.querySelector(`#marvelComic-row`);
-    
+    render: (endpoint, offset, limit, template) => {
+        const urlAPI = () => {
+            return `${baseUrl}/${endpoint}?${auth}&offset=${offset}&limit=${limit}`;
+        };
+        const container2 = document.querySelector(`#marvelComic-row`);
 
-    fetch(urlAPI(offset = 0, limit = 20,))
-    .then(res => res.json())
-    .then((json)=> {
-        
-        container2.innerHTML = render(json);
-      });
-   }
+
+        fetch(urlAPI(offset = 0, limit = 20, ))
+            .then(res => res.json())
+            .then((json) => {
+
+                container2.innerHTML = template(json);
+            });
+    }
 };
 
 const select = document.getElementById('selectType');
 
-select.addEventListener('change',(event) => {
-console.log('++++value++++', event.target.value);
-comicMarvel.render(event.target.value, 0, 20,renderComics);
+select.addEventListener('change', (event) => {
+    switch (event.target.value) {
+      case 'comics':
+        return comicMarvel.render(event.target.value, 0, 20, templateComics);
+      case 'characters':
+        return comicMarvel.render(event.target.value, 0, 20, templateHero); 
+      default:
+        return null;
+    }
 });
 
 // https://gateway.marvel.com:443/v1/public/comics?apikey=9ca1976d23ace42021fea1ba2225b7bd
@@ -93,6 +118,4 @@ const type = params.get("type");
 const order = params.get("order");
 const page = params.get("page");
 
-params.set('page', page+1)
-
-
+params.set('page', page + 1)
