@@ -118,3 +118,11 @@ searchInput.addEventListener('change', (event) => {
   searchTerm = event.target.value;
   renderAll(resource, page, searchTerm)
 })
+
+const params = new URLSearchParams(window.location.search);
+const search = params.get("s");
+const page = params.get("page");
+const order = params.get("order");
+
+params.set(`page`,page + 1)
+// params.set(`order`,-name)
