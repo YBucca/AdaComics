@@ -118,11 +118,34 @@ searchInput.addEventListener('change', (event) => {
   searchTerm = event.target.value;
   renderAll(resource, page, searchTerm)
 })
+// const params = new URLSearchParams(window.location.search);
 
-const params = new URLSearchParams(window.location.search);
-const search = params.get("s");
-const page = params.get("page");
-const order = params.get("order");
+const btnComics = document.getElementById('btn')
+const setParams = () => {
+   
+    const params = new URLSearchParams(window.location.search);
 
-params.set(`page`,page + 1)
+    const searchInput = document.getElementById('search');
+    const selectType = document.getElementById('selectType');
+    const sortType = document.getElementById('sortType');
+
+    console.log(searchInput.value)
+    console.log(selectType.value)
+    console.log(sortType.value)
+    params.set('search', searchInput.value)
+    params.set('type', selectType.value)
+    params.set('sort', sortType.value)
+    
+    window.location.href = `${window.location.pathname}?${params.toString()}`
+
+
+}
+btnComics.addEventListener('click', setParams)
+
+
+// const search = params.get("s");
+// const page = params.get("page");
+// const order = params.get("order");
+
+// params.set(`page`,page + 1)
 // params.set(`order`,-name)
