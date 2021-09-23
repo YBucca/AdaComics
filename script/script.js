@@ -1,12 +1,21 @@
 const limit = 20;
 let totalCount;
+
 let resource;
-let searchTerm;
-let serchParam;
+let params = { page: 1 };// asi la pagina tiene un valor por defecto
+
 
 const getOffset = (page, limit) => {
     return (page - 1) * limit;
 }
+
+//convierte el objeto en query params, lo pone en codigo
+const encodeQueryData = (data) => {
+    const ret = [];
+    for (let d in data)
+        ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
+    return ret.join('&');
+};
 
 //  +++++   este es la funcion de comic +++++++++
 const baseUrl = `https://gateway.marvel.com:443/v1/public`;
@@ -45,12 +54,12 @@ const templateHero = (json) => {
 
 const comicMarvel = {
 
-    render: (endpoint, template, offset, searchParam) => {
+    render: (endpoint, template, queryParams) => {
         const urlAPI = () => {
-            return `${baseUrl}/${endpoint}?${auth}&offset=${offset}&limit=${limit}${searchParam}`;
+            return `${baseUrl}/${endpoint}?${auth}&${encodeQueryData(queryParams)}` 
         };
         const container2 = document.querySelector(`#marvelComic-row`);
-        fetch(urlAPI(offset))
+        fetch(urlAPI())
             .then(res => res.json())
             .then((json) => {
                 totalCount = json.data.total || 0;
@@ -61,14 +70,24 @@ const comicMarvel = {
 
 const select = document.getElementById('selectType');
 
-const renderAll = (resource, page, searchTerm) => {
+const renderAll = () => {
+    let queryParams;
     switch (resource) {
         case 'comics':
-            serchParam = searchTerm? `&titleStartsWith=${searchTerm}` : '';
-            return comicMarvel.render(resource, templateComics, getOffset(page, limit), serchParam);
+            queryParams = {
+                limit,
+                offset: getOffset(params.page, limit),
+                ...(params.searchTerm ? { titleStartsWith: params.searchTerm } : null) // si searchTerm tiene algun valor lo agrega al objeto 
+            }
+
+            return comicMarvel.render(resource, templateComics, queryParams);
         case 'characters':
-            serchParam = searchTerm? `&nameStartsWith=${searchTerm}` : '';
-            return comicMarvel.render(resource, templateHero, getOffset(page, limit), serchParam);
+            queryParams = {
+                limit,
+                offset: getOffset(params.page, limit),
+                ...(params.searchTerm ? { nameStartsWith: params.searchTerm } : null) // si searchTerm tiene algun valor lo agrega al objeto
+            }
+            return comicMarvel.render(resource, templateHero, queryParams);
         default:
             return null;
     }
@@ -76,13 +95,12 @@ const renderAll = (resource, page, searchTerm) => {
 
 select.addEventListener('change', (event) => {
     page = 1;
+    params.page = page;
     resource = event.target.value;
     renderAll(resource, page)
 });
 
 //###### PAGINACION #######
-
-const params = new URLSearchParams(window.location.search);
 const forwardAll = document.getElementById('forward-all');
 const returnAll = document.getElementById('return-all');
 const return1 = document.getElementById('return-one')
@@ -90,62 +108,40 @@ const forward1 = document.getElementById('forward-one')
 
 forwardAll.addEventListener('click', (event) => {
     page = totalCount % limit === 0 ? Math.floor(totalCount / limit) : Math.floor(totalCount / limit) + 1;
-    renderAll(resource, page)
+    params.page = page;
+    renderAll()
 })
 
 returnAll.addEventListener('click', (event) => {
     page = 1;
-    renderAll(resource, page)
+    params.page = page;
+    renderAll()
 })
 
 return1.addEventListener('click', (event) => {
     page = page - 1;
-    renderAll(resource, page)
+    params.page = page;
+    renderAll()
 })
 
 forward1.addEventListener('click', (event) => {
     page = page + 1;
-    renderAll(resource, page)
+    params.page = page;
+    renderAll()
 })
-
-let page = params.get("page") || 1;
 
 // Search
 
 const searchInput = document.getElementById('search')
 
 searchInput.addEventListener('change', (event) => {
-  searchTerm = event.target.value;
-  renderAll(resource, page, searchTerm)
+    params.searchTerm = event.target.value;
+    renderAll()
 })
-// const params = new URLSearchParams(window.location.search);
 
+// ++++ botn de busqueda+++++++    
 const btnComics = document.getElementById('btn')
-const setParams = () => {
-   
-    const params = new URLSearchParams(window.location.search);
+btnComics.addEventListener('click', () => {
 
-    const searchInput = document.getElementById('search');
-    const selectType = document.getElementById('selectType');
-    const sortType = document.getElementById('sortType');
-
-    console.log(searchInput.value)
-    console.log(selectType.value)
-    console.log(sortType.value)
-    params.set('search', searchInput.value)
-    params.set('type', selectType.value)
-    params.set('sort', sortType.value)
-    
-    window.location.href = `${window.location.pathname}?${params.toString()}`
-
-
-}
-btnComics.addEventListener('click', setParams)
-
-
-// const search = params.get("s");
-// const page = params.get("page");
-// const order = params.get("order");
-
-// params.set(`page`,page + 1)
-// params.set(`order`,-name)
+    params = new URLSearchParams(window.location.search);
+})
