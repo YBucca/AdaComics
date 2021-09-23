@@ -144,4 +144,9 @@ const btnComics = document.getElementById('btn')
 btnComics.addEventListener('click', () => {
 
     params = new URLSearchParams(window.location.search);
+const resultsTotal = document.getElementById('results');
+resultsTotal.innerText = totalCount
+
 })
+
+
