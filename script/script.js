@@ -2,7 +2,7 @@ const limit = 20;
 let totalCount;
 
 let resource;
-let params = { page: 1 };// asi la pagina tiene un valor por defecto
+const params = { page: 1 };// asi la pagina tiene un valor por defecto
 
 
 const getOffset = (page, limit) => {
@@ -27,30 +27,30 @@ const templateComics = (json) => {
         contentHTML += `
           <div class="col-md-3">
               <a href="${urlComic}" target="_blank">
-                <img src="${comic.thumbnail.path}.${comic.thumbnail.extension}" alt="${comic.title}" class="img-thumbnail"> 
+                <img src="${comic.thumbnail.path}.${comic.thumbnail.extension}" alt="${comic.title || comic.name}" class="img-thumbnail"> 
               </a>
-              <h3 class="title">${comic.title}"</h3>
+              <h3 class="title">${comic.title || comic.name}"</h3>
           </div> 
           `;
     }
     return contentHTML;
 };
 
-const templateHero = (json) => {
-    let contentHTML = '';
-    for (const hero of json.data.results) {
-        let urlHero = hero.urls[0].url;
-        contentHTML += `
-          <div class="col-md-3">
-              <a href="${urlHero}" target="_blank">
-                <img src="${hero.thumbnail.path}.${hero.thumbnail.extension}" alt="${hero.name}" class="img-thumbnail"> 
-              </a>
-              <h3 class="title">${hero.name}</h3>
-          </div> 
-          `;
-    }
-    return contentHTML;
-};
+// const templateHero = (json) => {
+//     let contentHTML = '';
+//     for (const hero of json.data.results) {
+//         let urlHero = hero.urls[0].url;
+//         contentHTML += `
+//           <div class="col-md-3">
+//               <a href="${urlHero}" target="_blank">
+//                 <img src="${hero.thumbnail.path}.${hero.thumbnail.extension}" alt="${hero.name}" class="img-thumbnail"> 
+//               </a>
+//               <h3 class="title">${hero.name}</h3>
+//           </div> 
+//           `;
+//     }
+//     return contentHTML;
+// };
 
 const comicMarvel = {
 
@@ -59,6 +59,8 @@ const comicMarvel = {
             return `${baseUrl}/${endpoint}?${auth}&${encodeQueryData(queryParams)}` 
         };
         const container2 = document.querySelector(`#marvelComic-row`);
+        window.history.pushState({},"",`?${encodeQueryData(queryParams)}`) //setea en la url
+        console.log(urlAPI())
         fetch(urlAPI())
             .then(res => res.json())
             .then((json) => {
@@ -71,26 +73,15 @@ const comicMarvel = {
 const select = document.getElementById('selectType');
 
 const renderAll = () => {
-    let queryParams;
-    switch (resource) {
-        case 'comics':
-            queryParams = {
+    const searchName = resource === "comics" ? "titleStartsWith" : "nameStartsWith";
+    const queryParams = {
                 limit,
                 offset: getOffset(params.page, limit),
-                ...(params.searchTerm ? { titleStartsWith: params.searchTerm } : null) // si searchTerm tiene algun valor lo agrega al objeto 
+                ...(params.searchTerm ? { [searchName]: params.searchTerm } : null) // si searchTerm tiene algun valor lo agrega al objeto 
             }
 
             return comicMarvel.render(resource, templateComics, queryParams);
-        case 'characters':
-            queryParams = {
-                limit,
-                offset: getOffset(params.page, limit),
-                ...(params.searchTerm ? { nameStartsWith: params.searchTerm } : null) // si searchTerm tiene algun valor lo agrega al objeto
-            }
-            return comicMarvel.render(resource, templateHero, queryParams);
-        default:
-            return null;
-    }
+    
 }
 
 select.addEventListener('change', (event) => {
@@ -125,6 +116,7 @@ return1.addEventListener('click', (event) => {
 })
 
 forward1.addEventListener('click', (event) => {
+    event.preventDefault();
     page = page + 1;
     params.page = page;
     renderAll()
@@ -139,14 +131,34 @@ searchInput.addEventListener('change', (event) => {
     renderAll()
 })
 
-// ++++ botn de busqueda+++++++    
-const btnComics = document.getElementById('btn')
-btnComics.addEventListener('click', () => {
 
-    params = new URLSearchParams(window.location.search);
-const resultsTotal = document.getElementById('results');
-resultsTotal.innerText = totalCount
+const searchForm = document.getElementById('search-form')
+searchForm.addEventListener('submit',(event) =>{
+    event.preventDefault();
+    const form = event.target;
+    
+    const params = new URLSearchParams(window.location.search)
+    params.set("search", form.search.value);
+    params.set("type",form.selectType.value);
+    params.set("sort",form.selectSort.value);
+    
+    window.location.href = "/?" + params.toString();
+
+    console.log(window.location)
+
 
 })
 
+//++++ resultados +++++
 
+//const resultsTotal = document.getElementById('results');
+//     resultsTotal.innerText = totalCount;
+
+
+
+//++++++ filtros +++++++
+// const selectFilter = document.getElementById('sortType')
+
+// const AZ = () = {
+//     return  
+// }
