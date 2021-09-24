@@ -84,6 +84,10 @@ main h3.title {
   font-size: 1.3rem;
 }
 
+main nav ul .pagination {
+  margin-top: 20px;
+}
+
 footer {
   background-color: #E73F42;
   width: 100%;
@@ -91,10 +95,10 @@ footer {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: vertical;
+  -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
+      -ms-flex-direction: row;
+          flex-direction: row;
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
@@ -103,6 +107,6 @@ footer {
           align-items: center;
   color: #ffff;
   font-size: 1.8rem;
-  font-family: "Bangers", cursive;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 /*# sourceMappingURL=main.css.map */
