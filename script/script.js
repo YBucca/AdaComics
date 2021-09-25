@@ -36,21 +36,7 @@ const templateComics = (json) => {
     return contentHTML;
 };
 
-// const templateHero = (json) => {
-//     let contentHTML = '';
-//     for (const hero of json.data.results) {
-//         let urlHero = hero.urls[0].url;
-//         contentHTML += `
-//           <div class="col-md-3">
-//               <a href="${urlHero}" target="_blank">
-//                 <img src="${hero.thumbnail.path}.${hero.thumbnail.extension}" alt="${hero.name}" class="img-thumbnail"> 
-//               </a>
-//               <h3 class="title">${hero.name}</h3>
-//           </div> 
-//           `;
-//     }
-//     return contentHTML;
-// };
+
 
 const comicMarvel = {
 
@@ -65,9 +51,11 @@ const comicMarvel = {
             .then(res => res.json())
             .then((json) => {
                 totalCount = json.data.total || 0;
+                console.log(json)
                 container2.innerHTML = template(json);
             });
     }
+    
 };
 
 const select = document.getElementById('selectType');
@@ -81,14 +69,19 @@ const renderAll = () => {
             }
 
             return comicMarvel.render(resource, templateComics, queryParams);
-    
+            
+    // esto en principio ya no la usariamos se reemplaza por 139 searchForm
 }
+
+
+// hay que sacar el evento change y usar el del boton del formulario
 
 select.addEventListener('change', (event) => {
     page = 1;
     params.page = page;
     resource = event.target.value;
     renderAll(resource, page)
+     
 });
 
 //###### PAGINACION #######
@@ -125,10 +118,11 @@ forward1.addEventListener('click', (event) => {
 // Search
 
 const searchInput = document.getElementById('search')
-
+// hay que sacar el evento change y usar el del boton del formulario
 searchInput.addEventListener('change', (event) => {
     params.searchTerm = event.target.value;
     renderAll()
+
 })
 
 
@@ -146,19 +140,21 @@ searchForm.addEventListener('submit',(event) =>{
 
     console.log(window.location)
 
+    
 
 })
-
 //++++ resultados +++++
 
-//const resultsTotal = document.getElementById('results');
+// const resultsTotal = document.getElementById('results');
+// const resultMarvel = () =>{
 //     resultsTotal.innerText = totalCount;
-
+// }
 
 
 //++++++ filtros +++++++
 // const selectFilter = document.getElementById('sortType')
 
-// const AZ = () = {
-//     return  
-// }
+// hay que guardar en una funcion el query para poder ordenarlo por title A-Z y 
+// por -title de Z-A 
+//en caso de mas nuevos y mas viejos hay que buscarlos por
+// modifed mas nuevos -modifed mas viejos. 
