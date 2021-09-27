@@ -4,12 +4,24 @@ let totalCount;
 let resource;
 const params = { page: 1 };// asi la pagina tiene un valor por defecto
 
+const getParams =  () => {
+  const params = new URLSearchParams(window.location.search)
+  const search = params.get("search");
+  const type = params.get("type");
+  const sort = params.get("sort");
+  const page = params.get("page");
 
-const getOffset = (page, limit) => {
-    return (page - 1) * limit;
+  return { search, type, sort, page}
 }
 
-//convierte el objeto en query params, lo pone en codigo
+const getOffset = (page, limit) => {
+    if (page)
+      return (page - 1) * limit;
+    else
+      return 0
+}
+
+// convierte el objeto en query params, lo pone en codigo
 const encodeQueryData = (data) => {
     const ret = [];
     for (let d in data)
@@ -36,24 +48,25 @@ const templateComics = (json) => {
     return contentHTML;
 };
 
-
-
 const comicMarvel = {
 
     render: (endpoint, template, queryParams) => {
-        const urlAPI = () => {
-            return `${baseUrl}/${endpoint}?${auth}&${encodeQueryData(queryParams)}` 
-        };
-        const container2 = document.querySelector(`#marvelComic-row`);
-        window.history.pushState({},"",`?${encodeQueryData(queryParams)}`) //setea en la url
-        console.log(urlAPI())
-        fetch(urlAPI())
-            .then(res => res.json())
-            .then((json) => {
-                totalCount = json.data.total || 0;
-                console.log(json)
-                container2.innerHTML = template(json);
-            });
+      const urlAPI = () => {
+          return `${baseUrl}/${endpoint}?${auth}&${encodeQueryData(queryParams)}` 
+      };
+      console.log('*** urlAPI *** ', urlAPI())
+      const container2 = document.querySelector(`#marvelComic-row`);
+      // window.history.pushState({},"",`?${encodeQueryData(queryParams)}`) //setea en la url
+      console.log(urlAPI())
+      fetch(urlAPI())
+      .then(res => res.json())
+      .then((json) => {
+          console.log('*** json *** ', json)
+          totalCount = json.data.total || 0;
+          console.log(json)
+          container2.innerHTML = template(json);
+          resultMarvel()
+      });
     }
     
 };
@@ -61,28 +74,76 @@ const comicMarvel = {
 const select = document.getElementById('selectType');
 
 const renderAll = () => {
-    const searchName = resource === "comics" ? "titleStartsWith" : "nameStartsWith";
+    const { search, type, sort, page } = getParams();
+    const searchName = type === "comics" ? "titleStartsWith" : "nameStartsWith";
+    let orderBy;
+    if (type === "comics" && sort === 'a-z') {
+      orderBy = 'title'
+    } else if (type === "comics" && sort === 'a-z') {
+      orderBy = '-title'
+    } else if (type === "comics" && sort === 'old-new') {
+      orderBy = '-modified'
+    } else if (type === "comics" && sort === 'new-old') {
+      orderBy = 'modified'
+    } else if (type === "character" && sort === 'a-z') {
+      orderBy = 'name'
+    } else if (type === "character" && sort === 'a-z') {
+      orderBy = '-name'
+    } else if (type === "character" && sort === 'old-new') {
+      orderBy = '-modified'
+    } else if (type === "character" && sort === 'new-old') {
+      orderBy = 'modified'
+    }
+    console.log('sort')
     const queryParams = {
-                limit,
-                offset: getOffset(params.page, limit),
-                ...(params.searchTerm ? { [searchName]: params.searchTerm } : null) // si searchTerm tiene algun valor lo agrega al objeto 
-            }
+      limit,
+      offset: getOffset(page, limit),
+      ...(search ? { [searchName]: search } : null), // si searchTerm tiene algun valor lo agrega al objeto 
+      ...(sort? { orderBy }: null)
+    }
 
-            return comicMarvel.render(resource, templateComics, queryParams);
-            
+    if (type)
+      return comicMarvel.render(type, templateComics, queryParams);
+
     // esto en principio ya no la usariamos se reemplaza por 139 searchForm
 }
 
-
-// hay que sacar el evento change y usar el del boton del formulario
-
-select.addEventListener('change', (event) => {
-    page = 1;
-    params.page = page;
-    resource = event.target.value;
-    renderAll(resource, page)
+// select.addEventListener('submit', (event) => {
+//     page = 1;
+//     params.page = page;
+//     resource = event.target.value;
+//     renderAll(resource, page)
      
-});
+// });
+
+// Search
+
+const searchInput = document.getElementById('search')
+// searchInput.addEventListener('submit', (event) => {
+//     params.searchTerm = event.target.value;
+//     renderAll()
+
+// })
+
+
+const searchForm = document.getElementById('search-form')
+searchForm.addEventListener('submit',(event) =>{
+  event.preventDefault();
+  const form = event.target;
+  
+  const params = new URLSearchParams(window.location.search)
+  params.set("search", form.search.value);
+  params.set("type",form.selectType.value);
+  params.set("sort",form.selectSort.value);
+  params.set("page", 1);
+  
+  window.location.href = "/?" + params.toString();
+
+  console.log(window.location)
+
+})
+
+renderAll();
 
 //###### PAGINACION #######
 const forwardAll = document.getElementById('forward-all');
@@ -91,64 +152,29 @@ const return1 = document.getElementById('return-one')
 const forward1 = document.getElementById('forward-one')
 
 forwardAll.addEventListener('click', (event) => {
-    page = totalCount % limit === 0 ? Math.floor(totalCount / limit) : Math.floor(totalCount / limit) + 1;
-    params.page = page;
     renderAll()
 })
 
 returnAll.addEventListener('click', (event) => {
-    page = 1;
-    params.page = page;
     renderAll()
 })
 
 return1.addEventListener('click', (event) => {
-    page = page - 1;
-    params.page = page;
     renderAll()
 })
 
 forward1.addEventListener('click', (event) => {
-    event.preventDefault();
-    page = page + 1;
-    params.page = page;
     renderAll()
 })
 
-// Search
+  
 
-const searchInput = document.getElementById('search')
-// hay que sacar el evento change y usar el del boton del formulario
-searchInput.addEventListener('change', (event) => {
-    params.searchTerm = event.target.value;
-    renderAll()
-
-})
-
-
-const searchForm = document.getElementById('search-form')
-searchForm.addEventListener('submit',(event) =>{
-    event.preventDefault();
-    const form = event.target;
-    
-    const params = new URLSearchParams(window.location.search)
-    params.set("search", form.search.value);
-    params.set("type",form.selectType.value);
-    params.set("sort",form.selectSort.value);
-    
-    window.location.href = "/?" + params.toString();
-
-    console.log(window.location)
-
-    
-
-})
 //++++ resultados +++++
 
-// const resultsTotal = document.getElementById('results');
-// const resultMarvel = () =>{
-//     resultsTotal.innerText = totalCount;
-// }
+const resultsTotal = document.getElementById('results');
+const resultMarvel = () =>{
+    resultsTotal.innerText = totalCount;
+}
 
 
 //++++++ filtros +++++++
